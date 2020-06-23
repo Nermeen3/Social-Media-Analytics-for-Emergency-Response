@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<!-- saved from url=(0155)https://app.powerbi.com/view?r=eyJrIjoiNmYyOTVmNDUtZWUwMS00MTdjLTk2ZjYtYTVjNGY3ZGViMWI3IiwidCI6IjZhNjcwYzk2LTY3NzktNGZkYS05YTk1LThlNmQ0NDg4MTk0YiIsImMiOjl9 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>
+    <title>Microsoft Power BI</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="jquery-ui" src="./Microsoft Power BI_files/jquery-ui.min.93a880490c16935b4aff.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="powerbi-models" src="./Microsoft Power BI_files/powerbi-models.min.2fad2061bc01ed3c6997.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="jsonFilter" src="./Microsoft Power BI_files/jsonfilter.min.b845c4a5542363355958.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="resizeSensor" src="./Microsoft Power BI_files/resizeSensor.min.56762a5b2b8cb523372e.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="cartesianVisuals" src="./Microsoft Power BI_files/cartesianVisuals.min.d21c91895a9f549a9368.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="treemapVisual" src="./Microsoft Power BI_files/treemapVisual.min.b7dcf0db8c44cce9c6d4.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="exploreActions" src="https://content.powerapps.com/resource/powerbiwfe/scripts/exploreActions.min.c8a7850ff338ebbbe2b2.js"></script><!--<base href="/">--><base href=".">
+    
+    <meta name="description" content="">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="https://app.powerbi.com/images/PowerBI_Favicon.ico">
+
+    <link rel="stylesheet" href="./Microsoft Power BI_files/jquery-ui.min.1401cd3a99bfb13b5079.css"><script>
+        var viewLoadingStarted = Date.now();
+
+
+
+        var skipCheckPowerBIAccessToken = true;
+        var powerBIAccessToken = 'any';
+        var reportId = 'any';
+        var getExplorationUrl = '/public/';
+        var getConceptualSchemaUrl = '/public/reports/conceptualschema';
+        var queryDataUrl = '/public/reports/querydata';
+        var resourceLoaderUrl = '/public/reports/resourcePackage/';
+        var routingUrl = '/public/routing/cluster/';
+        var resourceLoaderIncludePackageId = true;
+        var isLoadReportMessagePending = false;
+        var isReportControllerInitialized = false;
+        var isAnonymousEmbed = true;
+        var accessToken;
+        var oDataFilter;
+        var resolvedClusterUri = 'https://wabi-west-europe-redirect.analysis.windows.net/';
+        var resourceKey;
+        var resolveClusterError;
+        var modelsAndExplorationResponse;
+        var frontLoadStatus;
+        var frontLoadError;
+        var conceptualSchemaResponse;
+        var loadingState = "#Loading#";
+        var errorState = "#Error#";
+        var isConceptualSchemaCached;
+        var isModelsAndExplorationCached;
+        var conceptualSchemaDuration;
+        var clusterResolutionFrontLoadStartTime = null;
+        var clusterResolutionFrontLoadEndTime = null;
+        var modelsAndExplorationFrontLoadStartTime = null;
+        var modelsAndExplorationFrontLoadEndTime = null;
+        var conceptualSchemaFrontLoadStartTime = null;
+        var conceptualSchemaFrontLoadEndTime = null;
+        var responseRequestId;
+        var conceptualSchemaRequestId;
+        var conceptualSchemaResponseRequestId;
+        var modelsAndExplorationRequestId;
+        var modernEmbed = '' === "true";
+
+        //register for messages from parent window
+        window.addEventListener("message", receiveMessage, false);
+
+        //handle message from parent window
+        function receiveMessage(event) {
+            if (event.data) {
+                try {
+                    var messageData = jsCommon.JsonExtensions.isJsonString(event.data) ? JSON.parse(event.data) : event.data;
+                    if (messageData.action === 'setPage') {
+                        if (!messageData.pageName) {
+                            return;
+                        }
+
+                        var pageName = messageData.pageName;
+                        if (isReportControllerInitialized) {
+                            setPage(pageName);
+                        }
+                    }
+                }
+                catch (e) {
+                    var embedReportLoadMessage = {
+                        event: 'error',
+                        error: 'Invalid message data:' + e.message,
+                    };
+                    window.parent.postMessage(JSON.stringify(embedReportLoadMessage), '*');
+                    return;
+                }
+            }
+        }
+
+        function resolveCluster() {
+            try {
+                var activityId = telemetrySessionId;
+                var requestId = 'ac2f04a2-9601-4a31-b6b8-5eb24c0cb5d1';
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try {
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            clusterResolutionFrontLoadEndTime = Date.now();
+                            var response = JSON.parse(xhr.responseText);
+                            if(response.FixedClusterUri) {
+                                resolvedClusterUri = response.FixedClusterUri;
+                                // Bug 121315: P2W frontload flow not working
+                                // getModelsAndExploration();
+                            }
+                            else {
+                                resolveClusterError = "FixedClusterUri is empty, activityid:" + activityId + "requestid:" + requestId;
+                            }
+                        }
+                    }
+                    catch(e) {
+                        resolveClusterError = "Exception:"+e.message +", activityid:" + activityId + "requestid:" + requestId;
+                    }
+                }
+
+                var apimClusterUri = getAPIMUrl(clusterUri);
+                xhr.open("GET", apimClusterUri + routingUrl + tenantId);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                clusterResolutionFrontLoadStartTime = Date.now();
+                xhr.send();
+            }
+            catch(e) {
+                resolveClusterError = "Exception:"+e.message +", activityid:" + activityId + "requestid:" + requestId;
+            }
+        }
+
+        function getModelsAndExploration() {
+            try {
+                var activityId = telemetrySessionId;
+                var requestId = '4a8d3d09-dcd4-4a03-96f1-0da90dfdd25f';
+                modelsAndExplorationResponse = loadingState;
+
+                if(!resolvedClusterUri) {
+                    modelsAndExplorationResponse = errorState;
+                    return;
+                }
+
+                var resolvedAPIMCluster = getAPIMUrl(resolvedClusterUri);
+                url = resolvedAPIMCluster + "/public/reports/" + resourceKey + "/modelsAndExploration?preferReadOnlySession=true";
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try{
+                        var status = xhr.status;
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            modelsAndExplorationFrontLoadEndTime = Date.now();
+                            var isSuccess = status >= 200 && status < 300 || status === 304;
+                            frontLoadStatus = status;
+                            if(isSuccess) {
+                                var data = JSON.parse(xhr.responseText);
+                                responseRequestId =  xhr.getResponseHeader('requestId');
+                                isModelsAndExplorationCached = responseRequestId && responseRequestId !== requestId ? true: false;
+                                modelsAndExplorationRequestId = responseRequestId ? responseRequestId : requestId;
+                                setModelsAndExploration(data);
+                                getConceptualSchema();
+                            }
+                            else {
+                                try {
+                                    var data = JSON.parse(xhr.response);
+                                    if (data && data.error) {
+                                        frontLoadError = data.error;
+                                    }
+                                }
+                                catch (e) {
+                                    // If we cannot parse an error out of the response, just fall through to the end to return undefined
+                                }
+                                setModelsAndExploration(errorState);
+                            }
+                        }
+                    }
+                    catch(e) {
+                        setModelsAndExploration(errorState);
+                    }
+                }
+
+                xhr.open("GET", url);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                modelsAndExplorationFrontLoadStartTime = Date.now();
+                xhr.send();
+            }
+            catch(e) {
+                setModelsAndExploration(errorState);
+            }
+        }
+
+        function getConceptualSchema() {
+            try {
+                var modelId;
+                conceptualSchemaResponse = loadingState;
+
+                if(modelsAndExplorationResponse.models && modelsAndExplorationResponse.models.length > 0) {
+                    modelId = modelsAndExplorationResponse.models[0].id;
+                }
+                else {
+                    setConceptualSchema(errorState);
+                    return;
+                }
+
+                var activityId = telemetrySessionId;
+                var requestId = '04155721-1e6f-457d-ac6c-8f116040de1f';
+                conceptualSchemaResponse = loadingState;
+
+                var resolvedAPIMCluster = getAPIMUrl(resolvedClusterUri);
+                url = resolvedAPIMCluster + getConceptualSchemaUrl;
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try {
+                        conceptualSchemaFrontLoadEndTime = Date.now();
+                        var status = xhr.status;
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            var isSuccess = status >= 200 && status < 300 || status === 304;
+                            if(isSuccess) {
+                                var data = JSON.parse(xhr.responseText);
+                                conceptualSchemaDuration = conceptualSchemaFrontLoadEndTime - conceptualSchemaFrontLoadStartTime;
+                                responseRequestId =  xhr.getResponseHeader('requestId');
+                                isConceptualSchemaCached = responseRequestId && responseRequestId !== requestId ? true: false;
+                                conceptualSchemaRequestId = requestId;
+                                conceptualSchemaResponseRequestId = responseRequestId ? responseRequestId : requestId;
+                                setConceptualSchema(data);
+                            }
+                            else {
+                                setConceptualSchema(errorState);
+                            }
+                        }
+                    }
+                    catch(e) {
+                        setConceptualSchema(errorState);
+                    }
+                }
+
+                var data = "{\"modelIds\":["+ modelId +"]}";
+                xhr.open("POST", url);
+                setPOSTRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                conceptualSchemaFrontLoadStartTime = Date.now();
+                xhr.send(data);
+            }catch(e) {
+                setConceptualSchema(errorState);
+            }
+        }
+
+        function setGETRequestHeaders(xhr, activityId, requestId, resourceKey) {
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.setRequestHeader('ActivityId', activityId);
+            xhr.setRequestHeader('RequestId', requestId);
+            xhr.setRequestHeader('X-PowerBI-ResourceKey', resourceKey);
+        }
+
+        function setPOSTRequestHeaders(xhr, activityId, requestId, resourceKey) {
+            setGETRequestHeaders(xhr, activityId, requestId, resourceKey);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+        }
+
+        function setConceptualSchema(data) {
+            conceptualSchemaResponse = data;
+        }
+
+        function setModelsAndExploration(data) {
+            modelsAndExplorationResponse = data;
+        }
+
+        function getAPIMUrl(clusterUri) {
+            var parser = document.createElement('a');
+            parser.href = clusterUri;
+
+            var protocol =  parser.protocol;
+            var hostname =  parser.hostname;
+
+            var hostNameTakens = hostname.split(".");
+            hostNameTakens[0] = hostNameTakens[0].replace("-redirect", "");
+            hostNameTakens[0] = hostNameTakens[0].replace("global-", "");
+            hostNameTakens[0] += "-api";
+            var apiHostName = hostNameTakens.join(".");
+            return protocol + "//" + apiHostName;
+        }
+
+        function isResponseCached(responseRequestId, requestId) {
+            if(responseRequestId && responseRequestId !== requestId) {
+                return true;
+            }
+            return false;
+        }
+
+        var baseUrl = window.location.protocol + '//' + window.location.host;
+        var powerbi = {
+            session : {
+                userInfo: {
+                    alternateEmail: '',
+                }
+            }
+        };
+
+        powerbi.telemetrySamplingRules = 'embed';
+        powerbi.build = '13.0.13599.209';
+        powerbi.buildDetails = '13.0.13599.209';
+        powerbi.clientVersion = '2006.2.01600-train';
+        powerbi.customVisualsUrl = 'https://visuals.azureedge.net/;https://visuals2.azureedge.net/;https://extendcustomvisual.blob.core.windows.net/';
+        powerbi.visualCDNBlobContainerUrl = 'prod';
+        powerbi.common = {};
+        powerbi.common.cultureInfo = 'en-US';
+        powerbi.common.formattingLocale = 'en-US';
+        var useCDN = 'True';
+        var clusterUri =  'https://api.powerbi.com';
+        var cdnUrl = 'https://content.powerapps.com/resource/powerbiwfe';
+        var previousTenantId = '';
+        var telemetrySessionId =  '3cf6e38f-dd38-4ab2-8fc6-b73385dd5d9a';
+        var sessionSource = "Embed";
+        var allowTelemetry = true;
+        var appInsightsV2InstrKey = '00406067-1af3-44c5-a2c1-4a57dd50194c';
+        var appInsightsV2EndpointUrl = '';
+        var initialDashboardContainer = undefined;
+        var appLoadError = undefined;
+
+        var  url = window.location.href;
+        var reportQueryString = new RegExp('[\\?&]r=([^&#]*)').exec(url);
+        if (reportQueryString) {
+            try {
+                var embedCode = decodeURIComponent(reportQueryString[1]);
+                var encodedReport = JSON.parse(atob(embedCode));
+                var tenantId = encodedReport.t;
+                resourceKey = encodedReport.k;
+                if (resolvedClusterUri == '') {
+                    resolvedClusterUri = undefined;
+                    resolveCluster();
+                } else {
+                    // Bug 121315: P2W frontload flow not working
+                    // getModelsAndExploration();
+                }
+            }
+            catch(e) {
+                resolveClusterError = "Exception: " + e.message + ", activityid: " + telemetrySessionId;
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="./Microsoft Power BI_files/reportembed.bundle.min.36e7bba321e0b3d10300.css" onerror="cdnFallback(event)">
+
+<script data-dapp-detection="">
+(function() {
+  let alreadyInsertedMetaTag = false
+
+  function __insertDappDetected() {
+    if (!alreadyInsertedMetaTag) {
+      const meta = document.createElement('meta')
+      meta.name = 'dapp-detected'
+      document.head.appendChild(meta)
+      alreadyInsertedMetaTag = true
+    }
+  }
+
+  if (window.hasOwnProperty('web3')) {
+    // Note a closure can't be used for this var because some sites like
+    // www.wnyc.org do a second script execution via eval for some reason.
+    window.__disableDappDetectionInsertion = true
+    // Likely oldWeb3 is undefined and it has a property only because
+    // we defined it. Some sites like wnyc.org are evaling all scripts
+    // that exist again, so this is protection against multiple calls.
+    if (window.web3 === undefined) {
+      return
+    }
+    __insertDappDetected()
+  } else {
+    var oldWeb3 = window.web3
+    Object.defineProperty(window, 'web3', {
+      configurable: true,
+      set: function (val) {
+        if (!window.__disableDappDetectionInsertion)
+          __insertDappDetected()
+        oldWeb3 = val
+      },
+      get: function () {
+        if (!window.__disableDappDetectionInsertion)
+          __insertDappDetected()
+        return oldWeb3
+      }
+    })
+  }
+})()</script><style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; touch-action-delay: none; }
+[touch-action="auto"]{ -ms-touch-action: auto; touch-action: auto; touch-action-delay: none; }
+[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; touch-action-delay: none; }
+[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; touch-action-delay: none; }
+[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; touch-action-delay: none; }
+</style><style></style><script src="./Microsoft Power BI_files/ai.0.js.download"></script><script charset="utf-8" src="./Microsoft Power BI_files/reportEmbed.json-contracts.min.e60bd6e2f7127b33594c.js.download"></script><style>.logoBar[_ngcontent-udc-c2]   .logo[_ngcontent-udc-c2]   a[_ngcontent-udc-c2] {
+  border: transparent;
+  background: none;
+  padding: 0;
+  margin-left: 24px;
+}
+.logoBar[_ngcontent-udc-c2]   .logo[_ngcontent-udc-c2]   a[_ngcontent-udc-c2]:focus {
+  box-shadow: 0 0 5px #51caee;
+  outline: 1px solid #51cbee;
+}
+.logoBar[_ngcontent-udc-c2]   .logo[_ngcontent-udc-c2]   a[_ngcontent-udc-c2]   .icon[_ngcontent-udc-c2] {
+  margin: 0;
+}
+.logoBar[_ngcontent-udc-c2]   .logo[_ngcontent-udc-c2]   .socialSharing[_ngcontent-udc-c2] {
+  float: right;
+}</style><style>.navigation-wrapper[_ngcontent-udc-c3]   button[_ngcontent-udc-c3] {
+  border: transparent;
+  background: none;
+  padding: 0;
+  margin-left: 24px;
+}
+.navigation-wrapper[_ngcontent-udc-c3]   button[_ngcontent-udc-c3]:focus {
+  box-shadow: 0 0 5px #51caee;
+  outline: 1px solid #51cbee;
+}
+.navigation-wrapper[_ngcontent-udc-c3]   button[_ngcontent-udc-c3]   .icon[_ngcontent-udc-c3] {
+  margin: 0;
+}
+.navigation-wrapper[_ngcontent-udc-c3]   .socialIcon[_ngcontent-udc-c3] {
+  padding: 0;
+  cursor: pointer;
+}</style><style>.position-static[_nghost-udc-c6]   .notification-bar[_ngcontent-udc-c6] {
+  position: initial;
+}
+.notification-bar[_ngcontent-udc-c6] {
+  display: flex;
+  justify-content: space-between;
+  background: #777777;
+  width: auto;
+  height: 32px;
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 59;
+  border-bottom: 1px solid #E1DFDD;
+}
+@keyframes infiniteLoading {
+  from {
+    left: -200px;
+    width: 30%;
+  }
+  50% {
+    width: 30%;
+  }
+  70% {
+    width: 70%;
+  }
+  80% {
+    left: 50%;
+  }
+  95% {
+    left: 120%;
+  }
+  to {
+    left: 100%;
+  }
+}
+@keyframes progressBarState1 {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 90%;
+  }
+}
+@keyframes progressBarState2 {
+  0% {
+    width: 90%;
+  }
+  100% {
+    width: 95%;
+  }
+}
+@keyframes progressBarState3 {
+  0% {
+    width: 95%;
+  }
+  100% {
+    width: 98%;
+  }
+}
+@keyframes progressBarState4 {
+  0% {
+    width: 98%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+.notification-bar[_ngcontent-udc-c6]   .infiniteLoader[_ngcontent-udc-c6] {
+  height: 6px;
+  width: 200px;
+  position: relative;
+  overflow: hidden;
+  background-color: #FFF;
+  float: left;
+  top: 22px;
+}
+.notification-bar[_ngcontent-udc-c6]   .infiniteLoader[_ngcontent-udc-c6]:before {
+  display: block;
+  position: absolute;
+  content: '';
+  left: -200px;
+  width: 200px;
+  height: 6px;
+  background-color: #F2C811;
+  animation: infiniteLoading 2s linear infinite;
+}
+.notification-bar[_ngcontent-udc-c6]   .progressBarLoader[_ngcontent-udc-c6] {
+  width: 100%;
+  height: 2px;
+  display: block;
+  background-color: #F2C811;
+  animation-name: progressBarState1, progressBarState2, progressBarState3, progressBarState4;
+  animation-timing-function: linear;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-actions[_ngcontent-udc-c6] {
+  display: flex;
+  padding: 0 8px;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-actions[_ngcontent-udc-c6]   button[_ngcontent-udc-c6] {
+  display: block;
+  height: 24px;
+  margin: 4px 0;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-actions[_ngcontent-udc-c6]   button.primary[_ngcontent-udc-c6] {
+  padding: 2px 16px;
+  background-color: #FFF;
+  border: 1px solid #8A8886;
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-actions[_ngcontent-udc-c6]   button.last[_ngcontent-udc-c6] {
+  margin-right: 0;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-actions[_ngcontent-udc-c6]   button.dismissBtn[_ngcontent-udc-c6] {
+  background: none;
+  border: none;
+  margin-right: 0;
+  margin-left: 8px;
+  color: #605E5C;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6] {
+  flex-grow: 1;
+  box-sizing: border-box;
+  padding: 0 8px;
+  line-height: 32px;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   .icon[_ngcontent-udc-c6], .notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   spinner[_ngcontent-udc-c6] {
+  color: #605E5C;
+  float: left;
+  box-sizing: border-box;
+  padding-right: 8px;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   .powerbi-spinner[_ngcontent-udc-c6]   .spinner[_ngcontent-udc-c6]   .circle[_ngcontent-udc-c6]:after {
+  background: #FFF !important;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   .message[_ngcontent-udc-c6] {
+  color: #323130;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   a.actionLink[_ngcontent-udc-c6] {
+  padding: 0 8px;
+  color: #005A9E;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.notification-bar[_ngcontent-udc-c6]   .bar-content[_ngcontent-udc-c6]   .embeddedActionLink[_ngcontent-udc-c6] {
+  padding: 0;
+}
+.notification-bar.error[_ngcontent-udc-c6] {
+  background-color: #FDE7E9;
+}
+.notification-bar.info[_ngcontent-udc-c6] {
+  background-color: #F3F2F1;
+}
+.notification-bar.warning[_ngcontent-udc-c6], .notification-bar.sampleDataLoad[_ngcontent-udc-c6] {
+  background-color: #FFF4CE;
+}
+.notification-bar.sampleDataLoad[_ngcontent-udc-c6]   .progressBarLoader[_ngcontent-udc-c6] {
+  display: none;
+  background-color: unset;
+}
+@media print {
+  body[_nghost-udc-c6]   div.notification-bar[_ngcontent-udc-c6], body   div.notification-bar   [_nghost-udc-c6] {
+    display: none !important;
+  }
+}</style><style></style><style>[_nghost-udc-c13] {
+  position: absolute;
+  z-index: 10000003;
+}
+.accessibility-info[_ngcontent-udc-c13] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 10px;
+  padding: 10px 6px;
+  background: white;
+  border: #CCCCCC solid 1px;
+  box-shadow: 0px 0px 20px #CCCCCC;
+  outline: none;
+  font-family: 'Segoe UI', 'wf_segoe-ui_normal', helvetica, arial, sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+}
+.accessibility-info.accessibility-info-collapsed[_ngcontent-udc-c13] {
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0px;
+  overflow: hidden;
+  padding: 0;
+}
+.accessibility-info[_ngcontent-udc-c13]   a[_ngcontent-udc-c13], .accessibility-info[_ngcontent-udc-c13]   span.link[_ngcontent-udc-c13] {
+  color: #1F3A93;
+  text-decoration: underline;
+}
+.accessibility-info[_ngcontent-udc-c13]   span[_ngcontent-udc-c13]:focus, .accessibility-info[_ngcontent-udc-c13]   a[_ngcontent-udc-c13]:focus {
+  outline: none;
+  border: 1px dashed #333333;
+}
+.accessibility-info[_ngcontent-udc-c13]   a[_ngcontent-udc-c13]:visited {
+  color: #551A8B;
+}
+.accessibility-info[_ngcontent-udc-c13]   span[_ngcontent-udc-c13] {
+  color: #212121;
+}</style><style>.centered[_nghost-udc-c12] {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  margin-top: -60px;
+}
+[_nghost-udc-c12]   .dataLoaderSpinner[_ngcontent-udc-c12] {
+  height: 120px;
+  text-align: center;
+  animation: dataLoaderFadeIn 1s ease;
+}
+@keyframes dataLoaderFadeIn {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+[_nghost-udc-c12]   .dataLoaderSpinner[_ngcontent-udc-c12]   .powerbi-spinner[_ngcontent-udc-c12] {
+  margin: 20px;
+}
+[_nghost-udc-c12]   .dataLoaderSpinner[_ngcontent-udc-c12]   h3[_ngcontent-udc-c12] {
+  margin: 0;
+  font-family: 'Segoe UI Semilight', 'wf_segoe-ui_semilight', helvetica, arial, sans-serif;
+  font-weight: normal;
+}</style><style>.powerbi-spinner[_ngcontent-udc-c11] {
+  display: inline-block !important;
+  width: 20px;
+  height: 20px;
+  text-align: initial !important;
+  vertical-align: middle;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform: scale(0.35714286);
+}
+.powerbi-spinner.centered[_ngcontent-udc-c11] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -10px;
+  margin-left: -10px;
+}
+.powerbi-spinner.xlarge[_ngcontent-udc-c11] {
+  width: 48px;
+  height: 48px;
+}
+.powerbi-spinner.xlarge[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform: scale(0.85714286);
+}
+.powerbi-spinner.xlarge.centered[_ngcontent-udc-c11] {
+  margin-top: -24px;
+  margin-left: -24px;
+}
+.powerbi-spinner.large[_ngcontent-udc-c11] {
+  width: 32px;
+  height: 32px;
+}
+.powerbi-spinner.large[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform: scale(0.57142857);
+}
+.powerbi-spinner.large.centered[_ngcontent-udc-c11] {
+  margin-top: -16px;
+  margin-left: -16px;
+}
+.powerbi-spinner.small[_ngcontent-udc-c11] {
+  width: 20px;
+  height: 20px;
+}
+.powerbi-spinner.small[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform: scale(0.35714286);
+}
+.powerbi-spinner.small.centered[_ngcontent-udc-c11] {
+  margin-top: -10px;
+  margin-left: -10px;
+}
+.powerbi-spinner.xsmall[_ngcontent-udc-c11] {
+  width: 16px;
+  height: 16px;
+}
+.powerbi-spinner.xsmall[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform: scale(0.28571429);
+}
+.powerbi-spinner.xsmall.centered[_ngcontent-udc-c11] {
+  margin-top: -8px;
+  margin-left: -8px;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  position: static;
+  display: block;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  box-sizing: content-box;
+  transform-origin: 0 0;
+  -webkit-transform-origin: 0 0;
+}
+html[dir="rtl"][_ngcontent-udc-c11]   .powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11] {
+  transform-origin: top left;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11] {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  opacity: 0;
+  transform: rotate(225deg);
+  animation-iteration-count: infinite;
+  animation-name: orbit;
+  animation-duration: 5.5s;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11]:after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  background: #666;
+  
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11]:nth-child(2) {
+  animation-delay: 360ms;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11]:nth-child(3) {
+  animation-delay: 720ms;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11]:nth-child(4) {
+  animation-delay: 1080ms;
+}
+.powerbi-spinner[_ngcontent-udc-c11]   .spinner[_ngcontent-udc-c11]   .circle[_ngcontent-udc-c11]:nth-child(5) {
+  animation-delay: 1440ms;
+}
+@keyframes orbit {
+  0% {
+    transform: rotate(225deg);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  7% {
+    transform: rotate(345deg);
+    animation-timing-function: linear;
+  }
+  30% {
+    transform: rotate(455deg);
+    animation-timing-function: ease-in-out;
+  }
+  39% {
+    transform: rotate(690deg);
+    animation-timing-function: linear;
+  }
+  70% {
+    transform: rotate(815deg);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  75% {
+    transform: rotate(945deg);
+    animation-timing-function: ease-out;
+  }
+  76% {
+    transform: rotate(945deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(945deg);
+    opacity: 0;
+  }
+}</style><style>[_nghost-udc-c22] {
+  position: absolute;
+  border: 1px solid #797775;
+  background-color: rgba(121, 119, 117, 0.5);
+  z-index: 10000002;
+}</style><style>.sensitivityBanner[_ngcontent-udc-c24] {
+  height: 44px;
+  margin-bottom: 4px;
+}</style><script charset="utf-8" src="./Microsoft Power BI_files/reportEmbed.exploration-persistent-state.min.8457488d6ff4184d6540.js.download"></script><style type="text/css">@keyframes resizeanim {from { opacity: 0; } to { opacity: 0; }} .ResizeSensor__resizeTriggers { animation: 1ms resizeanim; visibility: hidden; opacity: 0; } .ResizeSensor__resizeTriggers, .ResizeSensor__resizeTriggers > div, .ResizeSensor__contractTrigger:before { content: ' '; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .ResizeSensor__resizeTriggers > div { background: #eee; overflow: auto; } .ResizeSensor__contractTrigger:before { width: 200%; height: 200%; }</style><style>transform[_ngcontent-udc-c20] {
+  pointer-events: auto;
+}
+.explorationContainer.reading[_nghost-udc-c20]   .exploreCanvas[_ngcontent-udc-c20]   transform.selected[_ngcontent-udc-c20]:hover:not(.popOut), .explorationContainer.reading   .exploreCanvas   [_nghost-udc-c20]   transform.selected[_ngcontent-udc-c20]:hover:not(.popOut) {
+  z-index: 10000001 !important;
+}
+.explorationContainer.editing[_nghost-udc-c20]   .exploreCanvas[_ngcontent-udc-c20]:hover   transform.selected[_ngcontent-udc-c20]:not(.popOut), .explorationContainer.editing   .exploreCanvas:hover   [_nghost-udc-c20]   transform.selected[_ngcontent-udc-c20]:not(.popOut) {
+  z-index: 10000001 !important;
+}
+.explorationContainer[_nghost-udc-c20]   .exploreCanvas.stylableVisualContainerHeader[_ngcontent-udc-c20]   transform.dragging[_ngcontent-udc-c20]   .vcHeader[_ngcontent-udc-c20], .explorationContainer   .exploreCanvas.stylableVisualContainerHeader   [_nghost-udc-c20]   transform.dragging[_ngcontent-udc-c20]   .vcHeader[_ngcontent-udc-c20], .explorationContainer[_nghost-udc-c20]   .exploreCanvas.stylableVisualContainerHeader[_ngcontent-udc-c20]   transform.resizing[_ngcontent-udc-c20]   .vcHeader[_ngcontent-udc-c20], .explorationContainer   .exploreCanvas.stylableVisualContainerHeader   [_nghost-udc-c20]   transform.resizing[_ngcontent-udc-c20]   .vcHeader[_ngcontent-udc-c20] {
+  display: none;
+}</style><style>[_nghost-udc-c25] {
+  position: absolute;
+}</style><style>.visualHeaderItemContainer[_ngcontent-udc-c34] {
+  display: inline-block;
+  vertical-align: top;
+}
+.stylableVisualContainerHeader[_nghost-udc-c34]   .visualHeaderItemContainer[_ngcontent-udc-c34], .stylableVisualContainerHeader   [_nghost-udc-c34]   .visualHeaderItemContainer[_ngcontent-udc-c34] {
+  height: 20px;
+  padding-top: 1px;
+  margin-left: 4px;
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}</style><style>[_nghost-udc-c37] {
+  width: 100%;
+}
+[_nghost-udc-c37]   .visual-tooltip-container[_ngcontent-udc-c37] {
+  position: relative;
+}
+[_nghost-udc-c37]   .loading-message-container[_ngcontent-udc-c37] {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+html[_nghost-udc-c37]:not([dir="rtl"])   [_nghost-udc-c37]   .loading-message-container[_ngcontent-udc-c37], html:not([dir="rtl"])   [_nghost-udc-c37]   [_nghost-udc-c37]   .loading-message-container[_ngcontent-udc-c37] {
+  left: 0;
+}
+html[dir="rtl"][_nghost-udc-c37]   [_nghost-udc-c37]   .loading-message-container[_ngcontent-udc-c37], html[dir="rtl"]   [_nghost-udc-c37]   [_nghost-udc-c37]   .loading-message-container[_ngcontent-udc-c37] {
+  right: 0;
+}
+[_nghost-udc-c37]   .loading-message[_ngcontent-udc-c37] {
+  display: inline-block;
+  margin-top: 25%;
+  font-size: 12px;
+  color: #C8C8C8;
+}</style><style>.explorationContainer[_ngcontent-udc-c38] {
+  overflow: hidden;
+  background-color: #FFF;
+  border: 1px solid #333333;
+}</style></head>
+<body>
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Power BI Report">
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="Report powered by Power BI">
+    <meta property="og:image" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.f3eedd0bae32356ba16f.png">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Power BI Report">
+    <meta name="twitter:description" content="Report powered by Power BI">
+    <meta name="twitter:image:src" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.f3eedd0bae32356ba16f.png">
+    <meta name="twitter:image" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.f3eedd0bae32356ba16f.png">
+
+    <!-- perf: loading screen directly on page -->
+    
+
+    <div id="pbiAppPlaceHolder">
+        <!----><ui-view><!----><information-protection-banner-wrapper ng-if="loadSensitivity" [artifact-object-id]="artifactObjectId" _nghost-udc-c24="" ng-version="9.1.0"><!----></information-protection-banner-wrapper><!----><!----><!----><!----><div><div id="embedWrapperID" class="embedWrapper" tabindex="0" ng-keydown="keyDown($event)" localize-attr="{&#39;aria-label&#39;: &#39;Embed_Wrapper_Hint&#39;}" aria-label="Press Ctrl + Enter key to navigate into the report."><!----><div ng-if="!showErrorMessage &amp;&amp; !showPromptForLogin &amp;&amp; !optimizePublishToWeb &amp;&amp; !isUserUnauthorized" class="landingController fillAvailableSpace" ng-style="embedWithSensitivityBannerStyle"><div class="landingContainer"><div id="reportLandingContainer" class="embeddedLandingRootContent reportContainerContent isActive embeddedPV embeddedLandingRootContentLogoVisible" ng-class="backgroundCssClass + (showLogoBar ? &#39; embeddedLandingRootContentLogoVisible&#39; : &#39; embeddedLandingRootContentLogoHidden&#39;)"><div class="embeddedPV"><!----><exploration-container [use-legacy]="useLegacyExplorationContainer()" [view-model]="exploreContainer" ng-if="exploreContainer" [canvas-options]="canvasOptions" [exploration-container-options]="explorationContainerOptions" ng-version="9.1.0"><!----><!----><exploration-container-modern><!----><div class="explorationContainer explorationWithChrome themeableElement reading" downgrade-injector-patcher="" prevent-focus-loss="true"><!----><notification-bar _nghost-udc-c6=""><!----></notification-bar><div class="explorationHost explorationHostNoAppBar"><exploration-host id="pvExplorationHost" _nghost-udc-c7=""><div _ngcontent-udc-c7="" class="fillAvailableSpace verticalItemsContainer"><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----><div class="horizontalItemsContainer"><exploration data-automation-type="exploration" class="exploreCanvasToBottom"><div class="exploration" role="application" toolbar-container=""><accessibility-info data-automation-type="accessibilityInfo" _nghost-udc-c13=""><div _ngcontent-udc-c13="" class="accessibility-info accessibility-info-collapsed"><a _ngcontent-udc-c13="" href="https://go.microsoft.com/fwlink/?linkid=852575" keyboard-shortcuts="ctrl-Enter" localize="AccessibilityInfo_Link" target="_blank">Tips for using Power BI with a screen reader.</a><span _ngcontent-udc-c13="" class="link pbi-focus-outline" localize="AccessibilityInfo_SkipToContent" role="button" tabindex="0">Skip to main content.</span><span _ngcontent-udc-c13="" aria-label="Also you can press &quot;Question mark&quot; to show keyboard shortcuts.">Also you can press "?" to show keyboard shortcuts.</span></div></accessibility-info><!----><!----><explore-canvas-modern class="explore-canvas-modern-style" _nghost-udc-c14=""><div _ngcontent-udc-c14="" class="exploreCanvas themeableElement disableAnimations stylableVisualContainerHeader master-form-factor"><!----><!----><div _ngcontent-udc-c14="" class="backgroundContainer outspaceContainer" style="opacity: 1; background-color: rgb(249, 247, 242);"><!----></div><!----><div _ngcontent-udc-c14="" class="canvasFlexBox"><div _ngcontent-udc-c14="" class="displayAreaContainer droppableElement ui-droppable" style="overflow: hidden;"><div _ngcontent-udc-c14="" class="displayAreaViewport"></div><div _ngcontent-udc-c14="" class="displayArea disableAnimations fitToPage" container-printer="" print-container-selector="displayArea" style="height: 3464px; width: 6158.22px; position: absolute; left: 760.889px; top: 0px; box-shadow: rgb(200, 200, 200) 0px 0px 10px; outline: none;"><div _ngcontent-udc-c14="" class="backgroundContainer visualBackgroundContainer themableBackgroundColorSolid" style="opacity: 1; background-color: rgb(249, 247, 242);"><!----></div><div _ngcontent-udc-c14="" class="visualContainerHost" focus-nav-mode="Group" focus-priority="0" keyboard-shortcuts="ctrl-F6" tab-order-enabled=""><!----><!----><!----><!----><!----><visual-container-repeat _ngcontent-udc-c14=""><!----><visual-container-modern class="visual-container-component" _nghost-udc-c20=""><transform _ngcontent-udc-c20="" data-automation-type="visualContainer" _nghost-udc-c25="" drag-resize-disabled="true" preserve-aspect-ratio="false" style="height: 2776px; width: 2907px; transform: translate(3251px, 158px); z-index: 0;"><div _ngcontent-udc-c20="" class="visualContainer unselectable droppableElement ui-droppable readMode hideBorder" extended-shortcut-scope="" skip-children-focus="" toolbar-anchor="" tabindex="0" aria-label="Irrelevant Line and clustered column chart" touch-action="auto"><div _ngcontent-udc-c20="" class="visualContainerBorder themableBorderColor"></div><div _ngcontent-udc-c20="" class="visualContainerScreen"></div><!----><!----><!----><!----><div _ngcontent-udc-c20=""><!----><!----><div _ngcontent-udc-c20="" class="vcBody themableBackgroundColor themableBorderColorSolid " style="transform: scale(4.81111); width: 604.368px; height: 576.959px; background-color: rgb(249, 247, 242);"><!----><div _ngcontent-udc-c20="" class="visualTitle themableBackgroundColor themableColor" title="Irrelevant" style="visibility: visible; font-size: 15pt; font-family: Verdana; color: rgb(52, 139, 116); height: 24px; text-align: center;"><!----><div _ngcontent-udc-c20=""><div _ngcontent-udc-c20="" class="preTextWithEllipsis" style="width: 594.368px;">Irrelevant</div></div></div><!----><visual-modern _ngcontent-udc-c20="" data-automation-type="visual" _nghost-udc-c29=""><div _ngcontent-udc-c29="" class="visual visual-lineClusteredColumnComboChart allow-deferred-rendering" focus-nav-mode="Group" initialized=""><svg class="cartesianChart" width="594.3683083511777" height="542.9593147751606" style="position: absolute; margin-top: 0px;"><rect class="clearCatcher" width="100%" height="100%"></rect><g class="axisGraphicsContext" transform="translate(61,8)"><g class="y axis showLinesOnAxis" data-automation-type="y axis" transform="translate(0,0)" style="fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;"><g class="tick" transform="translate(0,445.9593147751606)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-4.5<title>-4.5</title></text></g><g class="tick" transform="translate(0,396.5193909112538)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-4.0<title>-4.0</title></text></g><g class="tick" transform="translate(0,347.0794670473471)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-3.5<title>-3.5</title></text></g><g class="tick" transform="translate(0,297.6395431834404)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-3.0<title>-3.0</title></text></g><g class="tick" transform="translate(0,248.19961931953367)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-2.5<title>-2.5</title></text></g><g class="tick" transform="translate(0,198.7596954556269)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-2.0<title>-2.0</title></text></g><g class="tick" transform="translate(0,149.3197715917202)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-1.5<title>-1.5</title></text></g><g class="tick" transform="translate(0,99.87984772781346)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-1.0<title>-1.0</title></text></g><g class="tick" transform="translate(0,50.43992386390675)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">-0.5<title>-0.5</title></text></g><g class="tick" transform="translate(0,1)" style="opacity: 1;"><line x2="533.3683083511777" y2="0" class="zero-line" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy=".32em" x="-10" y="0" style="text-anchor: end; fill: rgb(96, 94, 92);">0.0<title>0.0</title></text></g><path class="domain" d="M533.3683083511777,1H0V445.9593147751606H533.3683083511777"></path></g><g class="y axis" data-automation-type="y2 axis" transform="translate(533.3683083511777,0)"></g><text class="xAxisLabel" transform="translate(266.68415417558884,530.9593147751606)" style="text-anchor: middle; fill: rgb(37, 36, 35); font-family: Verdana; font-size: 16px;">bottom_words<title>bottom_words</title></text><text class="yAxisLabel" transform="rotate(-90)" y="-64" x="-223.4796573875803" dy="1em" style="text-anchor: middle; fill: rgb(37, 36, 35); font-family: Verdana; font-size: 16px;">bottom_scores<title>bottom_scores</title></text></g><svg class="svgScrollable" x="0" width="594.3683083511777" height="542.9593147751606" style="overflow: hidden;"><g class="axisGraphicsContext columnChart lineChart" transform="translate(61,8)"><g class="x axis hideLinesOnAxis setFocusRing" data-automation-type="x axis" transform="translate(0,446.9593147751606)" tabindex="0" focusable="true" aria-label="bottom_words"><g class="tick" transform="translate(33.86465449848751,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">new<title>new</title></text></g><g class="tick" transform="translate(76.19547262159685,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">such<title>such</title></text></g><g class="tick" transform="translate(118.52629074470619,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">anderson<title>anderson</title></text></g><g class="tick" transform="translate(160.85710886781553,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">scwx<title>scwx</title></text></g><g class="tick" transform="translate(203.18792699092486,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">poll<title>poll</title></text></g><g class="tick" transform="translate(245.5187451140342,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">finally<title>finally</title></text></g><g class="tick" transform="translate(287.8495632371435,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">blazing<title>blazing</title></text></g><g class="tick" transform="translate(330.18038136025285,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">todayng<title>todayng</title></text></g><g class="tick" transform="translate(372.5111994833622,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">long<title>long</title></text></g><g class="tick" transform="translate(414.84201760647153,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">skies<title>skies</title></text></g><g class="tick" transform="translate(457.17283572958087,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">see<title>see</title></text></g><g class="tick" transform="translate(499.5036538526902,0)" style="opacity: 1;"><line y2="0" x2="0" style="stroke: rgb(200, 198, 196); stroke-width: 1; stroke-dasharray: 1, 5;"></line><text dy="-0.5em" y="12px" x="0" dx="-10.576615293492846px" transform="rotate(-35)" tabindex="0" focusable="true" data-automation-type="axis-tick-text" class="setFocusRing" style="text-anchor: end; fill: rgb(96, 94, 92); font-family: Verdana; font-size: 12px;">nowplaying<title>nowplaying</title></text></g><path class="domain" d="M0,0V0H533.3683083511777V0"></path></g><g class="columnChartUnclippedGraphicsContext"><svg class="mainGraphicsContext setFocusRing" tabindex="0" focusable="true" aria-label="Plot area" data-automation-type="mainGraphicsContext" height="446.9593147751606" width="533.3683083511777"><g class="series" style="fill: rgb(103, 168, 151);"><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words new. bottom_scores -2.76." data-automation-type="column-chart-rect" width="33.335519271948606" x="16.93232724924377" y="1" height="273.2042112913318" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words such. bottom_scores -3.07." data-automation-type="column-chart-rect" width="33.335519271948606" x="59.26314537235311" y="1" height="303.0995482335959" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words anderson. bottom_scores -3.14." data-automation-type="column-chart-rect" width="33.335519271948606" x="101.59396349546245" y="1" height="310.54679575684446" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words scwx. bottom_scores -3.14." data-automation-type="column-chart-rect" width="33.335519271948606" x="143.92478161857179" y="1" height="310.54679575684446" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words poll. bottom_scores -3.19." data-automation-type="column-chart-rect" width="33.335519271948606" x="186.25559974168112" y="1" height="315.11630984068887" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words finally. bottom_scores -3.25." data-automation-type="column-chart-rect" width="33.335519271948606" x="228.58641786479046" y="1" height="321.40281402116" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words blazing. bottom_scores -3.29." data-automation-type="column-chart-rect" width="33.335519271948606" x="270.9172359878998" y="1" height="325.69812422545596" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words todayng. bottom_scores -3.36." data-automation-type="column-chart-rect" width="33.335519271948606" x="313.24805411100914" y="1" height="332.3827160031323" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words long. bottom_scores -3.40." data-automation-type="column-chart-rect" width="33.335519271948606" x="355.5788722341185" y="1" height="336.5506524797904" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words skies. bottom_scores -3.45." data-automation-type="column-chart-rect" width="33.335519271948606" x="397.9096903572278" y="1" height="341.2703117945285" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words see. bottom_scores -3.77." data-automation-type="column-chart-rect" width="33.335519271948606" x="440.24050848033716" y="1" height="372.95786083775175" style="fill-opacity: 1;"></rect><rect class="column setFocusRing" tabindex="0" focusable="true" aria-label="bottom_words nowplaying. bottom_scores -4.07." data-automation-type="column-chart-rect" width="33.335519271948606" x="482.5713266034465" y="1" height="402.54292918684547" style="fill-opacity: 1;"></rect></g><use href="#currentFocusDataPoint-cf2ac557-f40d-f7b7-041b-0c7c5f623c21" style="pointer-events: none; fill: none;"></use></svg></g><rect class="scale-detector" width="1" height="1" stroke-width="0px" fill="none"></rect><svg class="lineChartSVG" height="446.9593147751606" width="533.3683083511777"><g class="forecast-line-layer"></g><defs></defs><g aria-label="Plot area" class="mainGraphicsContext" skip-children-focus="true"><g class="selected-markers"></g></g><g class="hover-line"><line x1="0" x2="0" y1="0" y2="0" style="opacity: 1e-06; stroke: rgb(96, 94, 92);"></line></g></svg><svg class="trend-line-layer" height="446.9593147751606" width="533.3683083511777"></svg></g><g class="labelBackgroundGraphicsContext" transform="translate(61,8)"></g><g class="labelGraphicsContext" transform="translate(61,8)"></g></svg></svg></div></visual-modern><!----><!----><!----><!----></div></div><!----><!----><!----></div></transform></visual-container-modern><visual-container-modern class="visual-container-component" _nghost-udc-c20=""><transform _ngcontent-udc-c20="" data-automation-type="visualContainer" _nghost-udc-c25="" drag-resize-disabled="true" preserve-aspect-ratio="false" style="height: 2776px; width: 3079px; transform: translate(0px, 158px); z-index: 1000;"><div _ngcontent-udc-c20="" class="visualContainer unselectable droppableElement ui-droppable readMode hideBorder" extended-shortcut-scope="" skip-children-focus="" toolbar-anchor="" tabindex="0" aria-label="Top Disasters Treemap" touch-action="auto"><div _ngcontent-udc-c20="" class="visualContainerBorder themableBorderColor"></div><div _ngcontent-udc-c20="" class="visualContainerScreen"></div><!----><!----><!----><visual-container-header-modern _ngcontent-udc-c20="" data-automation-type="visualContainerHeader" visual-container-header-group="" _nghost-udc-c27=""><div _ngcontent-udc-c27="" class="vcHeader themableBackgroundColorSolid" focus-nav-mode="Group" keyboard-shortcuts="alt-shift-F10 scoped"><!----><!----><!----><!----><!----><visual-container-drill _ngcontent-udc-c27=""><!----><!----><visual-header-item-container _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button aria-label="Drill up" class="drillDownLevelGrouped glyphicon glyph-small pbi-glyph-drillup-nocircle" disabled=""></button></div></visual-header-item-container><!----><visual-container-drill-toggle class="optionSection"><!----><visual-header-item-container _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button class="drillDownLevelGrouped glyphicon glyph-small pbi-glyph-drilldowndisabled-nocircle" aria-label="Click to turn on Drill down"></button></div></visual-header-item-container></visual-container-drill-toggle><!----><visual-header-item-container _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button data-automation-type="drillDownLevelButton" aria-label="Go to the next level in the hierarchy" class="drillDownLevelGrouped glyphicon glyph-small pbi-glyph-expand-nocircle"></button></div></visual-header-item-container><!----><visual-header-item-container _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button aria-label="Expand all down one level in the hierarchy" class="drillDownLevelGrouped glyphicon glyph-small pbi-glyph-inline-drill-nocircle"></button></div></visual-header-item-container></visual-container-drill><i _ngcontent-udc-c27="" class="dragGrip glyphicon pbi-glyph-gripperbarhorizontal glyph-small"></i><div _ngcontent-udc-c27="" class="optionsMenu"><!----><!----><!----><!----><visual-container-pin-button _ngcontent-udc-c27="" class="optionSection" tabindex="-1"><!----><visual-header-item-container _nghost-udc-c34="" hidden=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button class="vcPinBtn" aria-label="Pin visual"><i class="glyphicon pbi-glyph-pinned glyph-small"></i></button></div></visual-header-item-container></visual-container-pin-button><!----><!----><visual-container-filter-restatement-button _ngcontent-udc-c27="" class="optionSection" tabindex="-1" _nghost-udc-c36=""><!----><visual-header-item-container _ngcontent-udc-c36="" _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button _ngcontent-udc-c36="" aria-expanded="false" aria-haspopup="true" class="vcFilterRestatementBtn" aria-label="Button to show current filters for visual"><i _ngcontent-udc-c36="" class="glyphicon pbi-glyph-filter glyph-small"></i></button></div></visual-header-item-container></visual-container-filter-restatement-button><!----><div _ngcontent-udc-c27="" class="optionSection"><!----><visual-header-item-container _ngcontent-udc-c27="" class="vcPopOutBtn" _nghost-udc-c34=""><div _ngcontent-udc-c34="" class="visualHeaderItemContainer themeableElement" style="background-color: rgb(255, 255, 255); border-color: rgb(255, 255, 255);"><button _ngcontent-udc-c27="" class="vcPopOutBtn" aria-label="Focus mode"><i _ngcontent-udc-c27="" class="glyphicon pbi-glyph-miniexpand glyph-small"></i></button></div></visual-header-item-container><!----><!----></div></div><div class="ResizeSensor ResizeSensor__resizeTriggers"><div class="ResizeSensor__expandTrigger"><div style="width: 213px; height: 29px;"></div></div><div class="ResizeSensor__contractTrigger"></div></div></div></visual-container-header-modern><!----><div _ngcontent-udc-c20=""><!----><!----><div _ngcontent-udc-c20="" class="vcBody themableBackgroundColor themableBorderColorSolid " style="transform: scale(4.81111); width: 640px; height: 576.959px; background-color: rgb(249, 247, 242);"><!----><div _ngcontent-udc-c20="" class="visualTitle themableBackgroundColor themableColor" title="Top Disasters" style="visibility: visible; font-size: 15pt; font-family: Verdana; color: rgb(146, 68, 46); height: 24px; text-align: center;"><!----><div _ngcontent-udc-c20=""><div _ngcontent-udc-c20="" class="preTextWithEllipsis" style="width: 630px;">Top Disasters</div></div></div><!----><visual-modern _ngcontent-udc-c20="" data-automation-type="visual" _nghost-udc-c29=""><div _ngcontent-udc-c29="" class="visual visual-treemap allow-deferred-rendering" focus-nav-mode="Group" initialized=""><svg class="treemap" width="630" height="542.9593147751606" style="position: absolute; margin-top: 0px;"><g class="shapes setFocusRing" tabindex="0" focusable="true" aria-label="Plot area" style="stroke: rgb(249, 247, 242);"><rect class="rootNode treemapNode setFocusRing" tabindex="0" focusable="true" x="0" y="0" width="630" height="542.9593147751606" style="fill: none;"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words hiroshima. top_scores 6.83." x="0" y="0" width="240.53421391273702" height="176.21052214123043" style="fill: rgb(66, 104, 113);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words fires. top_scores 4.89." x="0" y="176.21052214123043" width="240.53421391273702" height="126.07925946353015" style="fill: rgb(210, 176, 76);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words storm. top_scores 4.75." x="0" y="302.2897816047606" width="240.53421391273702" height="122.39567931343794" style="fill: rgb(163, 98, 58);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words massacre. top_scores 4.59." x="0" y="424.68546091819854" width="240.53421391273702" height="118.27385385696208" style="fill: rgb(194, 90, 61);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words wildfire. top_scores 4.39." x="240.53421391273702" y="0" width="130.70316982614298" height="208.57642307114642" style="fill: rgb(195, 155, 106);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words flood. top_scores 4.36." x="371.23738373888" y="0" width="129.71787917089466" height="208.57642307114642" style="fill: rgb(1, 110, 81);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words terrorism. top_scores 4.34." x="500.95526290977466" y="0" width="129.04473709022534" height="208.57642307114642" style="fill: rgb(153, 143, 133);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words derailment. top_scores 4.30." x="240.53421391273702" y="208.57642307114642" width="237.37222570940173" height="112.34505803152395" style="fill: rgb(255, 165, 0);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words bombing. top_scores 4.27." x="240.53421391273702" y="320.9214811026704" width="237.37222570940173" height="111.5305934410581" style="fill: rgb(135, 172, 182);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words typhoon. top_scores 4.23." x="240.53421391273702" y="432.4520745437285" width="237.37222570940173" height="110.50724023143206" style="fill: rgb(184, 169, 1);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words rioting. top_scores 4.16." x="477.90643962213875" y="208.57642307114642" width="152.09356037786125" height="169.50163560798012" style="fill: rgb(253, 177, 93);"></rect><rect class="parentGroup treemapNode setFocusRing" tabindex="0" focusable="true" aria-label="top_words earthquake. top_scores 4.04." x="477.90643962213875" y="378.07805867912657" width="152.09356037786125" height="164.881256096034" style="fill: rgb(244, 132, 89);"></rect><use href="#currentFocusDataPoint-a68c2126-6931-8314-aa76-a7e0885e1b95" style="pointer-events: none; fill: none;"></use></g><g class="labels"><text class="majorLabel" x="5" y="18.333333333333332" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">hiroshima</text><text class="majorLabel" x="5" y="194.54385547456377" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">fires</text><text class="majorLabel" x="5" y="320.6231149380939" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">storm</text><text class="majorLabel" x="5" y="443.01879425153186" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">massacre</text><text class="majorLabel" x="245.53421391273702" y="18.333333333333332" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">wildfire</text><text class="majorLabel" x="376.23738373888" y="18.333333333333332" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">flood</text><text class="majorLabel" x="505.95526290977466" y="18.333333333333332" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">terrorism</text><text class="majorLabel" x="245.53421391273702" y="226.90975640447977" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">derailment</text><text class="majorLabel" x="245.53421391273702" y="339.2548144360037" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">bombing</text><text class="majorLabel" x="245.53421391273702" y="450.7854078770618" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">typhoon</text><text class="majorLabel" x="482.90643962213875" y="226.90975640447977" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">rioting</text><text class="majorLabel" x="482.90643962213875" y="396.4113920124599" style="fill: rgb(249, 247, 242); font-family: Verdana; font-size: 13.3333px; font-weight: normal;">earthquake</text></g></svg></div></visual-modern><!----><!----><!----><!----></div></div><!----><!----><!----></div></transform></visual-container-modern></visual-container-repeat></div><!----></div><!----><lasso-select-window _ngcontent-udc-c14="" _nghost-udc-c22="" hidden=""></lasso-select-window><div class="ResizeSensor ResizeSensor__resizeTriggers"><div class="ResizeSensor__expandTrigger"><div style="width: 7681px; height: 3465px;"></div></div><div class="ResizeSensor__contractTrigger"></div></div></div><!----></div></div></explore-canvas-modern></div></exploration><!----><!----><!----></div></div></exploration-host></div><!----><!----></div></exploration-container-modern></exploration-container><!----></div></div></div></div><!----><!----></div><div class="logoBarWrapper" ng-keydown="keyDown($event)" tabindex="0"><!----><logo-bar ng-if="showLogoBar" _nghost-udc-c2="" ng-version="9.1.0"><div _ngcontent-udc-c2="" class="unselectable"><div _ngcontent-udc-c2="" class="logoBar"><div _ngcontent-udc-c2="" class="logo"><!----><!----><a _ngcontent-udc-c2="" tab-order-child="" target="_blank" href="https://go.microsoft.com/fwlink/?LinkID=722383&amp;clcid=0x409"><span _ngcontent-udc-c2="" class="text" localize="Embed_Logobar_MarketingText">Microsoft Power BI</span></a><logo-bar-navigation _ngcontent-udc-c2="" is-full-screen="isFullScreen()" is-small-screen="isSmallScreen" mail-to-link="mailToLink" show-about-dialog="showAboutDialog()" show-full-screen="showFullScreen" toggle-full-screen-mode="toggleFullScreenMode()"><span class="navigation-wrapper navigation-wrapper-big" keyboard-shortcuts="ctrl-F6"><a><i class="glyphicon glyph-small pbi-glyph-chevronleftmedium middleIcon pbi-focus-outline active" focus-element="" tabindex="0" title="Previous Page"></i></a><!----><a class="middleText"><!----><span><span class="innerText">3</span><span class="innerText" localize="Of">of</span><span class="innerText">3</span></span><!----></a><a><i class="glyphicon glyph-small pbi-glyph-chevronrightmedium middleIcon pbi-focus-outline inactive" focus-element="" tabindex="0" title="Next Page"></i></a><!----></span><!----><!----><section class="navFlyout" flyout-visible="false" id="flyoutElement" style="height: 127px;"><div class="wrapper"><div class="textContainer"><div class="flyoutSections"><ul class="list"><!----><li class="sectionItemHidden animated"><a class="sectionItem" title="Page 3">Page 3</a></li><li class="sectionItemHidden animated"><a class="sectionItem" title="Page 1">Page 1</a></li><li class="sectionItemHidden animated"><a class="sectionItem selected" title="Page 2">Page 2</a></li></ul></div></div></div><div class="arrow"></div></section></logo-bar-navigation><span _ngcontent-udc-c2="" class="socialSharing"><!----><span _ngcontent-udc-c2=""><logo-bar-social-sharing _ngcontent-udc-c2="" _nghost-udc-c3=""><!----><span _ngcontent-udc-c3="" class="navigation-wrapper"><!----><a _ngcontent-udc-c3="" localizetooltip="ReportEmbed_Logobar_LinkedIn" target="_blank" title="LinkedIn" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fapp.powerbi.com%2Fview%3Fr%3DeyJrIjoiNmYyOTVmNDUtZWUwMS00MTdjLTk2ZjYtYTVjNGY3ZGViMWI3IiwidCI6IjZhNjcwYzk2LTY3NzktNGZkYS05YTk1LThlNmQ0NDg4MTk0YiIsImMiOjl9%26pageName%3DReportSectiond5cb50e73984b154419c"><div _ngcontent-udc-c3="" class="glyphicon glyphicon-share-linkedIn glyph-small socialIcon"></div></a><!----><a _ngcontent-udc-c3="" localizetooltip="ReportEmbed_Logobar_Twitter" target="_blank" title="Twitter" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fapp.powerbi.com%2Fview%3Fr%3DeyJrIjoiNmYyOTVmNDUtZWUwMS00MTdjLTk2ZjYtYTVjNGY3ZGViMWI3IiwidCI6IjZhNjcwYzk2LTY3NzktNGZkYS05YTk1LThlNmQ0NDg4MTk0YiIsImMiOjl9%26pageName%3DReportSectiond5cb50e73984b154419c"><div _ngcontent-udc-c3="" class="glyphicon glyphicon-share-twitter glyph-small socialIcon"></div></a><!----><a _ngcontent-udc-c3="" localizetooltip="ReportEmbed_Logobar_Facebook" target="_blank" title="Facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapp.powerbi.com%2Fview%3Fr%3DeyJrIjoiNmYyOTVmNDUtZWUwMS00MTdjLTk2ZjYtYTVjNGY3ZGViMWI3IiwidCI6IjZhNjcwYzk2LTY3NzktNGZkYS05YTk1LThlNmQ0NDg4MTk0YiIsImMiOjl9%26pageName%3DReportSectiond5cb50e73984b154419c"><div _ngcontent-udc-c3="" class="glyphicon glyphicon-share-facebook glyph-small socialIcon"></div></a><!----><button _ngcontent-udc-c3="" localizetooltip="ReportEmbed_Logobar_Share" title="Share"><i _ngcontent-udc-c3="" class="glyphicon pbi-glyph-share glyph-small socialIcon"></i></button></span><!----><!----></logo-bar-social-sharing></span><!----><!----><!----><a _ngcontent-udc-c2="" id="fullScreenIcon"><!----><i _ngcontent-udc-c2="" class="glyphicon glyph-small pbi-glyph-fullscreen icon" localizetooltip="ReportEmbed_Logobar_FullScreen_Enter" title="Enter Full Screen Mode"></i><!----></a></span></div></div></div></logo-bar><!----></div></div></ui-view>
+        <root ng-version="9.1.0"><!----></root>
+    </div>
+
+    <script> function cdnFallback(event) {var date = new Date(); var failedRequestUrl = 'unknown'; var maxAgeInSeconds = 8 * 60 * 60;if (event && event.currentTarget && event.currentTarget.src) {failedRequestUrl = event.currentTarget.src;}document.cookie = 'disablecdn=cdnRequestFailureTimestamp:' + date.toUTCString() + '-cdnRequestFailureUrl:' + failedRequestUrl + '; max-age=' + maxAgeInSeconds + '; secure';window.location.reload(true); }</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['globalize.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/globalize.min.8e8ec43af69cf3d5d7aa.js.download" defer="" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['globalize.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['globalize.culture.en-US.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/globalize.culture.en-US.07ca294f77f622a072a5.js.download" defer="" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['globalize.culture.en-US.js'].end = Date.now();</script>    <script>
+
+        powerbi.common.localizedStrings = '';
+    </script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['hash-manifest.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/hash-manifest.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['hash-manifest.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['reportembed.externals.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/reportembed.externals.bundle.min.c458b087c273f0dc05e1.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['reportembed.externals.bundle.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['powerbiportal.dependencies.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/powerbiportal.dependencies.bundle.min.ae599df54790b003d9a0.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['powerbiportal.dependencies.bundle.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['reportembed.common.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/reportembed.common.bundle.min.79e4a6573076930e2026.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['reportembed.common.bundle.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['powerbiportal.explore.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/powerbiportal.explore.bundle.min.60fa7700c74e9bc6aaf1.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['powerbiportal.explore.bundle.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['reportembed.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/reportembed.bundle.min.aaf0cb7d362ce705248f.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['reportembed.bundle.min.js'].end = Date.now();</script><script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {};this.parseTimeMarkers['reportEmbed.min.js'] = { nominalStart: Date.now(), start: Date.now()};</script><script type="text/javascript" src="./Microsoft Power BI_files/reportEmbed.min.ea1f2de7fe9d28ec421c.js.download" onerror="cdnFallback(event)"></script>
+<script type="text/javascript">this.parseTimeMarkers['reportEmbed.min.js'].end = Date.now();</script>
+
+
+<div class="cdk-live-announcer-element cdk-visually-hidden" aria-atomic="true" aria-live="polite"></div><div id="uvpn_rate_us" style="display: none;">            <div class="uvpn_wrap">                <div class="uvpn_logo-ext">                    <div class="uvpn_logo-wrap">                        <img src="chrome-extension://jaoafpkngncfpfggjefnekilbkcpjdgp/img/128.png">                    </div>                </div>                <div class="uvpn_title">                    Don’t Forget to Rate Us                </div>                <div class="uvpn_desc">                    If you enjoy our product, give us 5 stars. It helps so much!                </div>                <div class="stars">                    <svg xmlns="http://www.w3.org/2000/svg" width="1235" height="1175" viewBox="0 0 1235 1175">                        <path fill="#cf6218" d="M0,449h1235l-999,726 382-1175 382,1175z"></path>                    </svg>                    <svg xmlns="http://www.w3.org/2000/svg" width="1235" height="1175" viewBox="0 0 1235 1175">                        <path fill="#cf6218" d="M0,449h1235l-999,726 382-1175 382,1175z"></path>                    </svg>                    <svg xmlns="http://www.w3.org/2000/svg" width="1235" height="1175" viewBox="0 0 1235 1175">                        <path fill="#cf6218" d="M0,449h1235l-999,726 382-1175 382,1175z"></path>                    </svg>                    <svg xmlns="http://www.w3.org/2000/svg" width="1235" height="1175" viewBox="0 0 1235 1175">                        <path fill="#cf6218" d="M0,449h1235l-999,726 382-1175 382,1175z"></path>                    </svg>                    <svg xmlns="http://www.w3.org/2000/svg" width="1235" height="1175" viewBox="0 0 1235 1175">                        <path fill="#cf6218" d="M0,449h1235l-999,726 382-1175 382,1175z"></path>                    </svg>                </div>                <a target="_blank" href="https://chrome.google.com/webstore/detail/uvpn-free-and-unlimited-v/jaoafpkngncfpfggjefnekilbkcpjdgp/reviews" id="rate_btn_rateus" class="uvpn_rate-btn uvpn_btn">                    Rate Us                </a>                <div id="close_btn_rateus" class="uvpn_later-btn uvpn_btn">                    Not Now                </div>            </div>        </div><div id="svgProviderContainer" style="display: none;"></div><span></span><svg style="height: 0px; width: 0px; position: absolute;"><text visibility="hidden" font-family="&#39;Segoe UI Semibold&#39;, wf_segoe-ui_semibold, helvetica, arial, sans-serif" font-size="12px" white-space="nowrap">M</text></svg><div class="tooltip-container themeableElement left" style="left: 3149px; bottom: 1218px;"><div class="arrow bottom left" style="border-right-color: rgb(51, 51, 51); border-left-color: rgb(51, 51, 51); opacity: 1;"></div><visual-tooltip-modern [tooltip-data]="tooltipData" [tooltip-data-sources]="tooltipDataSources" [tooltip-data-items]="tooltipDataItems" (on-hide)="onHide()" (on-move)="onMove()" [actions-provider]="actionsProvider" [exploration-contract]="explorationContract" [exploration-capabilities]="explorationCapabilities" [show-action-bar]="showActionBar" [section-display-option]="sectionDisplayOption" [tooltip-shown]="tooltipShown" [discoverability-text]="discoverabilityText" [tooltip-style]="tooltipStyle" _nghost-udc-c37="" ng-version="9.1.0" class="tooltip-content"><div _ngcontent-udc-c37="" class="visual-tooltip-container"><!----><canvas-tooltip _ngcontent-udc-c37="" _nghost-udc-c38="" hidden=""><!----></canvas-tooltip><div _ngcontent-udc-c37=""><div class="tooltip-content-container" style="background-color: rgb(51, 51, 51); opacity: 1;"><div class="tooltip-data-container" style="direction: ltr;"><div class="tooltip-row"><div class="tooltip-title-cell" style="font-family: &quot;Segoe UI&quot;, wf_segoe-ui_normal, helvetica, arial, sans-serif; font-size: 12px; font-weight: 700;"><div>top_words</div></div><div class="tooltip-value-cell" style="font-family: &quot;Segoe UI Semibold&quot;, wf_segoe-ui_semibold, helvetica, arial, sans-serif; font-size: 12px; font-weight: 700;"><div>earthquake</div></div></div><div class="tooltip-row"><div class="tooltip-title-cell" style="font-family: &quot;Segoe UI&quot;, wf_segoe-ui_normal, helvetica, arial, sans-serif; font-size: 12px; font-weight: 700;"><div>top_scores</div></div><div class="tooltip-value-cell" style="font-family: &quot;Segoe UI Semibold&quot;, wf_segoe-ui_semibold, helvetica, arial, sans-serif; font-size: 12px; font-weight: 700;"><div>4.04</div></div></div></div></div></div><!----><!----></div></visual-tooltip-modern></div></body></html>
